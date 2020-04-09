@@ -1,0 +1,480 @@
+type: edu
+custom_name: stage3
+files:
+- name: src/bot/SimpleBot.java
+  visible: true
+  text: |
+    package bot;
+
+    import java.util.Scanner;
+
+    public class SimpleBot {
+        public static void main(String[] args) {
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.println("Hello! My name is Aid.");
+            System.out.println("I was created in 2018.");
+            System.out.println("Please, remind me your name.");
+
+            String name = scanner.nextLine();
+
+            System.out.println("What a great name you have, " + name + "!");
+            System.out.println("Let me guess your age.");
+            System.out.println("Enter remainders of dividing your age by 3, 5 and 7.");
+
+            int rem3 = scanner.nextInt();
+            int rem5 = scanner.nextInt();
+            int rem7 = scanner.nextInt();
+
+            int age = (rem3 * 70 + rem5 * 21 + rem7 * 15) % 105;
+
+            System.out.println("Your age is " + age + "; that's a good time to start programming!");
+            System.out.println("Now I will prove to you that I can count to any number you want.");
+
+            // read a number and count to it here
+
+            System.out.println("Completed, have a nice day!");
+        }
+    }
+  learner_created: false
+- name: test/PersonalAssistantTest.java
+  visible: false
+  text: |
+    import bot.SimpleBot;
+    import org.hyperskill.hstest.v6.stage.BaseStageTest;
+    import org.hyperskill.hstest.v6.testcase.CheckResult;
+    import org.hyperskill.hstest.v6.testcase.TestCase;
+
+    import java.util.List;
+
+
+    class Clue {
+        int age;
+        String name;
+        int count;
+
+        Clue(String name, int age, int count) {
+            this.age = age;
+            this.name = name;
+            this.count = count;
+        }
+    }
+
+
+    public class PersonalAssistantTest extends BaseStageTest<Clue> {
+
+        public PersonalAssistantTest() {
+            super(SimpleBot.class);
+        }
+
+        @Override
+        public List<TestCase<Clue>> generate() {
+            return List.of(
+                new TestCase<Clue>()
+                    .setInput("Marry\n1 0 5\n10")
+                    .setAttach(new Clue("Marry", 40, 10))
+            );
+        }
+
+        @Override
+        public CheckResult check(String reply, Clue clue) {
+
+            String[] lines = reply.trim().split("\n");
+
+            int length = 9 + clue.count + 1;
+
+            if (lines.length != length) {
+                return CheckResult.FALSE(
+                    "You should output " + length + " lines " +
+                    "(for the count number " + clue.count +").\n" +
+                    "Lines found: " + lines.length + "\n" +
+                    "Your output:\n" +
+                    reply
+                );
+            }
+
+            String lineWithName = lines[3].toLowerCase();
+            String name = clue.name.toLowerCase();
+
+            if (!lineWithName.contains(name)) {
+                return CheckResult.FALSE(
+                    "The name was " + clue.name + "\n" +
+                    "But the 4-th line was:\n" +
+                    "\"" + lines[3] + "\"\n\n" +
+                    "4-th line should contain a name of the user"
+                );
+            }
+
+            String lineWithAge = lines[6].toLowerCase();
+            String age = Integer.toString(clue.age);
+
+            if (!lineWithAge.contains(age)) {
+                return CheckResult.FALSE(
+                    "Can't find a correct age " +
+                    "in the last line of output! " +
+                    "Maybe you calculated the age wrong?\n\n" +
+                    "Your last line: \n" + "\"" + lines[6] + "\""
+                );
+            }
+
+            for (int i = 0; i < clue.count + 1; i++) {
+                String numLine = lines[i + 8];
+                String actualNum = i + "!";
+
+                if (!numLine.equals(actualNum)) {
+                    return CheckResult.FALSE(
+                        "Expected " + (i+8) + "-th line: \n" +
+                        "\"" + actualNum + "\"\n" +
+                        "Your "+ (i+8) + "-th line: \n" +
+                        "\"" + numLine + "\""
+                    );
+                }
+            }
+
+            return CheckResult.TRUE;
+        }
+
+    }
+  learner_created: false
+- name: hs_err_pid12740.log
+  visible: true
+  text: "#\n# There is insufficient memory for the Java Runtime Environment to continue.\n\
+    # Native memory allocation (mmap) failed to map 134217728 bytes for Failed to\
+    \ commit area from 0x00000000e0000000 to 0x00000000e8000000 of length 134217728.\n\
+    # Possible reasons:\n#   The system is out of physical RAM or swap space\n#  \
+    \ The process is running with CompressedOops enabled, and the Java Heap may be\
+    \ blocking the growth of the native heap\n# Possible solutions:\n#   Reduce memory\
+    \ load on the system\n#   Increase physical memory or swap space\n#   Check if\
+    \ swap backing store is full\n#   Decrease Java heap size (-Xmx/-Xms)\n#   Decrease\
+    \ number of Java threads\n#   Decrease Java thread stack sizes (-Xss)\n#   Set\
+    \ larger code cache with -XX:ReservedCodeCacheSize=\n# This output file may be\
+    \ truncated or incomplete.\n#\n#  Out of Memory Error (t:/workspace/open/src/hotspot/os/windows/os_windows.cpp:3264),\
+    \ pid=12740, tid=15424\n#\n# JRE version:  (12.0.2+10) (build )\n# Java VM: Java\
+    \ HotSpot(TM) 64-Bit Server VM (12.0.2+10, mixed mode, aot, sharing, tiered, compressed\
+    \ oops, g1 gc, windows-amd64)\n# No core dump will be written. Minidumps are not\
+    \ enabled by default on client versions of Windows\n#\n\n---------------  S U\
+    \ M M A R Y ------------\n\nCommand Line: -Dorg.gradle.native=false -Xmx512m -Dfile.encoding=utf-8\
+    \ -Duser.country=IN -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain\
+    \ 'Gradle Test Executor 1'\n\nHost: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz,\
+    \ 8 cores, 7G,  Windows 10 , 64 bit Build 18362 (10.0.18362.329)\nTime: Wed Apr\
+    \  8 20:17:23 2020 Bangladesh Standard Time elapsed time: 0 seconds (0d 0h 0m\
+    \ 0s)\n\n---------------  T H R E A D  ---------------\n\nCurrent thread (0x000001213cfca800):\
+    \  JavaThread \"Unknown thread\" [_thread_in_vm, id=15424, stack(0x0000001b47c00000,0x0000001b47d00000)]\n\
+    \nStack: [0x0000001b47c00000,0x0000001b47d00000]\nNative frames: (J=compiled Java\
+    \ code, j=interpreted, Vv=VM code, C=native code)\nV  [jvm.dll+0x63aa2a]\nV  [jvm.dll+0x78ce1e]\n\
+    V  [jvm.dll+0x78e4c1]\nV  [jvm.dll+0x78eb13]\nV  [jvm.dll+0x2627e8]\nV  [jvm.dll+0x637f5a]\n\
+    V  [jvm.dll+0x62c845]\nV  [jvm.dll+0x31e49c]\nV  [jvm.dll+0x31e2cf]\nV  [jvm.dll+0x324006]\n\
+    V  [jvm.dll+0x371f56]\nV  [jvm.dll+0x371720]\nV  [jvm.dll+0x2f845a]\nV  [jvm.dll+0x2f96d2]\n\
+    V  [jvm.dll+0x767267]\nV  [jvm.dll+0x7689f5]\nV  [jvm.dll+0x380059]\nV  [jvm.dll+0x74b794]\n\
+    V  [jvm.dll+0x3ef5cd]\nV  [jvm.dll+0x3f1471]\nC  [jli.dll+0x51cf]\nC  [ucrtbase.dll+0x20e72]\n\
+    C  [KERNEL32.DLL+0x17bd4]\nC  [ntdll.dll+0x6ced1]\n\n\n---------------  P R O\
+    \ C E S S  ---------------\n\nThreads class SMR info:\n_java_thread_list=0x00007ffbf13d7928,\
+    \ length=0, elements={\n}\n\nJava Threads: ( => current thread )\n\nOther Threads:\n\
+    \  0x000001213cfee800 GCTaskThread \"GC Thread#0\" [stack: 0x0000001b47d00000,0x0000001b47e00000]\
+    \ [id=10204]\n  0x000001213cff3000 ConcurrentGCThread \"G1 Main Marker\" [stack:\
+    \ 0x0000001b47e00000,0x0000001b47f00000] [id=11104]\n  0x000001213cff6800 ConcurrentGCThread\
+    \ \"G1 Conc#0\" [stack: 0x0000001b47f00000,0x0000001b48000000] [id=15084]\n\n\
+    [error occurred during error reporting (printing all threads), id 0xc0000005,\
+    \ EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007ffbf0c085e7]\n\nVM state:not\
+    \ at safepoint (not fully initialized)\n\nVM Mutex/Monitor currently owned by\
+    \ a thread:  ([mutex/lock_event])\n[0x000001213cfc83b0] Heap_lock - owner thread:\
+    \ 0x000001213cfca800\n\nHeap address: 0x00000000e0000000, size: 512 MB, Compressed\
+    \ Oops mode: Non-zero based: 0x00000000e0000000\nNarrow klass base: 0x0000000000000000,\
+    \ Narrow klass shift: 0\n\nGC Heap History (0 events):\nNo events\n\nDeoptimization\
+    \ events (0 events):\nNo events\n\nClasses redefined (0 events):\nNo events\n\n\
+    Internal exceptions (0 events):\nNo events\n\nEvents (0 events):\nNo events\n\n\
+    \nDynamic libraries:\n0x00007ff7e6c60000 - 0x00007ff7e6c6f000 \tC:\\Program Files\\\
+    Java\\jdk-12.0.2\\bin\\java.exe\n0x00007ffc3f000000 - 0x00007ffc3f1f0000 \tC:\\\
+    WINDOWS\\SYSTEM32\\ntdll.dll\n0x00007ffc3dd50000 - 0x00007ffc3de02000 \tC:\\WINDOWS\\\
+    System32\\KERNEL32.DLL\n0x00007ffc3c330000 - 0x00007ffc3c5d3000 \tC:\\WINDOWS\\\
+    System32\\KERNELBASE.dll\n0x00007ffc3c090000 - 0x00007ffc3c18a000 \tC:\\WINDOWS\\\
+    System32\\ucrtbase.dll\n0x00007ffc1e370000 - 0x00007ffc1e388000 \tC:\\Program\
+    \ Files\\Java\\jdk-12.0.2\\bin\\jli.dll\n0x00007ffc235c0000 - 0x00007ffc235d6000\
+    \ \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\VCRUNTIME140.dll\n0x00007ffc3df30000\
+    \ - 0x00007ffc3dfd3000 \tC:\\WINDOWS\\System32\\ADVAPI32.dll\n0x00007ffc3de10000\
+    \ - 0x00007ffc3deae000 \tC:\\WINDOWS\\System32\\msvcrt.dll\n0x00007ffc3d210000\
+    \ - 0x00007ffc3d2a7000 \tC:\\WINDOWS\\System32\\sechost.dll\n0x00007ffc3d900000\
+    \ - 0x00007ffc3da20000 \tC:\\WINDOWS\\System32\\RPCRT4.dll\n0x00007ffc3da30000\
+    \ - 0x00007ffc3dbc4000 \tC:\\WINDOWS\\System32\\USER32.dll\n0x00007ffc3c860000\
+    \ - 0x00007ffc3c881000 \tC:\\WINDOWS\\System32\\win32u.dll\n0x00007ffc2ce30000\
+    \ - 0x00007ffc2d0b5000 \tC:\\WINDOWS\\WinSxS\\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.18362.720_none_e6beb5c51314836b\\\
+    COMCTL32.dll\n0x00007ffc3d2b0000 - 0x00007ffc3d2d6000 \tC:\\WINDOWS\\System32\\\
+    GDI32.dll\n0x00007ffc3d440000 - 0x00007ffc3d776000 \tC:\\WINDOWS\\System32\\combase.dll\n\
+    0x00007ffc3c5e0000 - 0x00007ffc3c774000 \tC:\\WINDOWS\\System32\\gdi32full.dll\n\
+    0x00007ffc3c7e0000 - 0x00007ffc3c860000 \tC:\\WINDOWS\\System32\\bcryptPrimitives.dll\n\
+    0x00007ffc3d010000 - 0x00007ffc3d0ae000 \tC:\\WINDOWS\\System32\\msvcp_win.dll\n\
+    0x00007ffc36e70000 - 0x00007ffc36e7a000 \tC:\\WINDOWS\\SYSTEM32\\VERSION.dll\n\
+    0x00007ffc3d7f0000 - 0x00007ffc3d81e000 \tC:\\WINDOWS\\System32\\IMM32.DLL\n0x00007ffc08df0000\
+    \ - 0x00007ffc08e9a000 \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\msvcp140.dll\n\
+    0x00007ffbf0900000 - 0x00007ffbf1477000 \tC:\\Program Files\\Java\\jdk-12.0.2\\\
+    bin\\server\\jvm.dll\n0x00007ffc3d0c0000 - 0x00007ffc3d0c8000 \tC:\\WINDOWS\\\
+    System32\\PSAPI.DLL\n0x00007ffc28400000 - 0x00007ffc28409000 \tC:\\WINDOWS\\SYSTEM32\\\
+    WSOCK32.dll\n0x00007ffc37de0000 - 0x00007ffc37e04000 \tC:\\WINDOWS\\SYSTEM32\\\
+    WINMM.dll\n0x00007ffc3d780000 - 0x00007ffc3d7ef000 \tC:\\WINDOWS\\System32\\WS2_32.dll\n\
+    0x00007ffc37db0000 - 0x00007ffc37ddd000 \tC:\\WINDOWS\\SYSTEM32\\winmmbase.dll\n\
+    0x00007ffc3c040000 - 0x00007ffc3c08a000 \tC:\\WINDOWS\\System32\\cfgmgr32.dll\n\
+    0x00007ffc3bf00000 - 0x00007ffc3bf11000 \tC:\\WINDOWS\\System32\\kernel.appcore.dll\n\
+    0x00007ffc1e350000 - 0x00007ffc1e361000 \tC:\\Program Files\\Java\\jdk-12.0.2\\\
+    bin\\verify.dll\n0x00007ffc29d80000 - 0x00007ffc29f74000 \tC:\\WINDOWS\\SYSTEM32\\\
+    DBGHELP.DLL\n0x00007ffc29d50000 - 0x00007ffc29d7a000 \tC:\\WINDOWS\\SYSTEM32\\\
+    dbgcore.DLL\n0x00007ffc1e320000 - 0x00007ffc1e346000 \tC:\\Program Files\\Java\\\
+    jdk-12.0.2\\bin\\java.dll\n0x00007ffc1e300000 - 0x00007ffc1e317000 \tC:\\Program\
+    \ Files\\Java\\jdk-12.0.2\\bin\\zip.dll\n0x00007ffc236a0000 - 0x00007ffc236aa000\
+    \ \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\jimage.dll\n\ndbghelp: loaded successfully\
+    \ - version: 4.0.5 - missing functions: none\nsymbol engine: initialized successfully\
+    \ - sym options: 0x614 - pdb path: .;C:\\Program Files\\Java\\jdk-12.0.2\\bin;C:\\\
+    WINDOWS\\SYSTEM32;C:\\WINDOWS\\WinSxS\\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.18362.720_none_e6beb5c51314836b;C:\\\
+    Program Files\\Java\\jdk-12.0.2\\bin\\server\n\nVM Arguments:\njvm_args: -Dorg.gradle.native=false\
+    \ -Xmx512m -Dfile.encoding=utf-8 -Duser.country=IN -Duser.language=en -Duser.variant\
+    \ -ea \njava_command: worker.org.gradle.process.internal.worker.GradleWorkerMain\
+    \ 'Gradle Test Executor 1'\njava_class_path (initial): C:\\Users\\Asus\\.gradle\\\
+    caches\\5.3.1\\workerMain\\gradle-worker.jar;C:\\Users\\Asus\\IdeaProjects\\Simple\
+    \ Chatty Bot\\Simple Chatty Bot\\task\\build\\classes\\java\\test;C:\\Users\\\
+    Asus\\IdeaProjects\\Simple Chatty Bot\\Simple Chatty Bot\\task\\build\\resources\\\
+    test;C:\\Users\\Asus\\IdeaProjects\\Simple Chatty Bot\\Simple Chatty Bot\\task\\\
+    build\\classes\\java\\main;C:\\Users\\Asus\\IdeaProjects\\Simple Chatty Bot\\\
+    Simple Chatty Bot\\task\\build\\resources\\main;C:\\Users\\Asus\\.gradle\\caches\\\
+    modules-2\\files-2.1\\com.github.hyperskill\\hs-test\\v6.0.1\\f53c6e96c6c1da130d9d9c77cc2ce2de63a4294d\\\
+    hs-test-v6.0.1.jar;C:\\Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\com.github.stefanbirkner\\\
+    system-rules\\1.19.0\\d541c9a1cff0dda32e2436c74562e2e4aa6c88cd\\system-rules-1.19.0.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.assertj\\assertj-swing-junit\\\
+    3.8.0\\51a93135b0edac8f92cd67bceea6efa2e2dfa870\\assertj-swing-junit-3.8.0.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\junit\\junit\\4.12\\2973d150c0dc1fefe998f834810d68f278ea58ec\\\
+    junit-4.12.jar;C:\\Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.hamcrest\\\
+    hamcrest-core\\1.3\\42a25dc3219429f0e5d060061f71acb49bf010a0\\hamcrest-core-1.3.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\\
+    httpclient\\4.5.9\\a25c1be5ce99d0ce99aa43eb982868c796dd0775\\httpclient-4.5.9.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\com.google.code.gson\\gson\\\
+    2.8.5\\f645ed69d595b24d4cf8b3fbb64cc505bede8829\\gson-2.8.5.jar;C:\\Users\\Asus\\\
+    .gradle\\caches\\modules-2\\files-2.1\\com.cedarsoftware\\json-io\\4.10.1\\e9083dfdee4899ad2f6a83618c20ab3d7b88430b\\\
+    json-io-4.10.1.jar;C:\\Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\com.fasterxml.jackson.core\\\
+    jackson-databind\\2.9.8\\11283f21cc480aa86c4df7a0a3243ec508372ed2\\jackson-databind-2.9.8.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.assertj\\assertj-swing\\\
+    3.8.0\\43e985f95237bf9c5fbfa21230f30cc5e859a4fb\\assertj-swing-3.8.0.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.easytesting\\fest-r\n\
+    Launcher Type: SUN_STANDARD\n\n[Global flags]\n     intx CICompilerCount     \
+    \                     = 4                                         {product} {ergonomic}\n\
+    \     uint ConcGCThreads                            = 2                      \
+    \                   {product} {ergonomic}\n     uint G1ConcRefinementThreads \
+    \                 = 8                                         {product} {ergonomic}\n\
+    \   size_t G1HeapRegionSize                         = 1048576                \
+    \                   {product} {ergonomic}\n    uintx GCDrainStackTargetSize  \
+    \                 = 64                                        {product} {ergonomic}\n\
+    \   size_t InitialHeapSize                          = 134217728              \
+    \                   {product} {ergonomic}\n   size_t MarkStackSize           \
+    \                 = 4194304                                   {product} {ergonomic}\n\
+    \   size_t MaxHeapSize                              = 536870912              \
+    \                   {product} {command line}\n   size_t MinHeapDeltaBytes    \
+    \                    = 1048576                                   {product} {ergonomic}\n\
+    \    uintx NonNMethodCodeHeapSize                   = 5836300                \
+    \                {pd product} {ergonomic}\n    uintx NonProfiledCodeHeapSize \
+    \                 = 122910970                              {pd product} {ergonomic}\n\
+    \    uintx ProfiledCodeHeapSize                     = 122910970              \
+    \                {pd product} {ergonomic}\n    uintx ReservedCodeCacheSize   \
+    \                 = 251658240                              {pd product} {ergonomic}\n\
+    \     bool SegmentedCodeCache                       = true                   \
+    \                   {product} {ergonomic}\n     bool UseCompressedClassPointers\
+    \               = true                                 {lp64_product} {ergonomic}\n\
+    \     bool UseCompressedOops                        = true                   \
+    \              {lp64_product} {ergonomic}\n     bool UseG1GC                 \
+    \                 = true                                      {product} {ergonomic}\n\
+    \     bool UseLargePagesIndividualAllocation        = false                  \
+    \                {pd product} {ergonomic}\n\nLogging:\nLog output configuration:\n\
+    \ #0: stdout all=warning uptime,level,tags\n #1: stderr all=off uptime,level,tags\n\
+    \nEnvironment Variables:\nPATH=C:\\Program Files (x86)\\Intel\\iCLS Client\\;C:\\\
+    Program Files\\Intel\\iCLS Client\\;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\\
+    System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\
+    \ (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files (x86)\\Intel\\Intel(R)\
+    \ Management Engine Components\\DAL;C:\\Program Files\\Intel\\Intel(R) Management\
+    \ Engine Components\\DAL;C:\\Program Files (x86)\\Intel\\Intel(R) Management Engine\
+    \ Components\\IPT;C:\\Program Files\\Intel\\Intel(R) Management Engine Components\\\
+    IPT;C:\\Program Files\\Intel\\WiFi\\bin\\;C:\\Program Files\\Common Files\\Intel\\\
+    WirelessCommon\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\\
+    WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Git\\cmd;C:\\\
+    WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR;C:\\\
+    WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\\
+    WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Users\\Asus\\AppData\\\
+    Local\\Microsoft\\WindowsApps;C:\\Program Files\\Java\\jdk-12.0.2\\bin;\nUSERNAME=DEEPANSHU\n\
+    OS=Windows_NT\nPROCESSOR_IDENTIFIER=Intel64 Family 6 Model 158 Stepping 9, GenuineIntel\n\
+    \n\n\n---------------  S Y S T E M  ---------------\n\nOS: Windows 10 , 64 bit\
+    \ Build 18362 (10.0.18362.329)\n\nCPU:total 8 (initial active 8) (4 cores per\
+    \ cpu, 2 threads per core) family 6 model 158 stepping 9, cmov, cx8, fxsr, mmx,\
+    \ sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms,\
+    \ 3dnowpref, lzcnt, ht, tsc, tscinvbit, bmi1, bmi2, adx, fma\n\nMemory: 4k page,\
+    \ system-wide physical 8075M (1831M free)\nTotalPageFile size 8075M (AvailPageFile\
+    \ size 9M)\ncurrent process WorkingSet (physical memory assigned to process):\
+    \ 9M, peak: 9M\ncurrent process commit charge (\"private bytes\"): 59M, peak:\
+    \ 187M\n\nvm_info: Java HotSpot(TM) 64-Bit Server VM (12.0.2+10) for windows-amd64\
+    \ JRE (12.0.2+10), built on Jul 16 2019 01:56:17 by \"mach5one\" with MS VC++\
+    \ 15.5 (VS2017)\n\nEND.\n"
+  learner_created: false
+- name: hs_err_pid15960.log
+  visible: true
+  text: "#\n# There is insufficient memory for the Java Runtime Environment to continue.\n\
+    # Native memory allocation (malloc) failed to allocate 1048576 bytes for AllocateHeap\n\
+    # Possible reasons:\n#   The system is out of physical RAM or swap space\n#  \
+    \ The process is running with CompressedOops enabled, and the Java Heap may be\
+    \ blocking the growth of the native heap\n# Possible solutions:\n#   Reduce memory\
+    \ load on the system\n#   Increase physical memory or swap space\n#   Check if\
+    \ swap backing store is full\n#   Decrease Java heap size (-Xmx/-Xms)\n#   Decrease\
+    \ number of Java threads\n#   Decrease Java thread stack sizes (-Xss)\n#   Set\
+    \ larger code cache with -XX:ReservedCodeCacheSize=\n# This output file may be\
+    \ truncated or incomplete.\n#\n#  Out of Memory Error (t:/workspace/open/src/hotspot/share/memory/allocation.cpp:46),\
+    \ pid=15960, tid=9288\n#\n# JRE version:  (12.0.2+10) (build )\n# Java VM: Java\
+    \ HotSpot(TM) 64-Bit Server VM (12.0.2+10, mixed mode, aot, sharing, tiered, compressed\
+    \ oops, g1 gc, windows-amd64)\n# No core dump will be written. Minidumps are not\
+    \ enabled by default on client versions of Windows\n#\n\n---------------  S U\
+    \ M M A R Y ------------\n\nCommand Line: -Dorg.gradle.native=false -Xmx512m -Dfile.encoding=utf-8\
+    \ -Duser.country=IN -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain\
+    \ 'Gradle Test Executor 2'\n\nHost: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz,\
+    \ 8 cores, 7G,  Windows 10 , 64 bit Build 18362 (10.0.18362.329)\nTime: Wed Apr\
+    \  8 20:17:39 2020 Bangladesh Standard Time elapsed time: 0 seconds (0d 0h 0m\
+    \ 0s)\n\n---------------  T H R E A D  ---------------\n\nCurrent thread (0x0000022177c6c000):\
+    \  JavaThread \"Unknown thread\" [_thread_in_vm, id=9288, stack(0x0000006944a00000,0x0000006944b00000)]\n\
+    \nStack: [0x0000006944a00000,0x0000006944b00000]\nNative frames: (J=compiled Java\
+    \ code, j=interpreted, Vv=VM code, C=native code)\nV  [jvm.dll+0x63aa2a]\nV  [jvm.dll+0x78ce1e]\n\
+    V  [jvm.dll+0x78e4c1]\nV  [jvm.dll+0x78eb13]\nV  [jvm.dll+0x2627e8]\nV  [jvm.dll+0xbcabf]\n\
+    V  [jvm.dll+0x300a83]\nV  [jvm.dll+0x2f9695]\nV  [jvm.dll+0x767267]\nV  [jvm.dll+0x7689f5]\n\
+    V  [jvm.dll+0x380059]\nV  [jvm.dll+0x74b794]\nV  [jvm.dll+0x3ef5cd]\nV  [jvm.dll+0x3f1471]\n\
+    C  [jli.dll+0x51cf]\nC  [ucrtbase.dll+0x20e72]\nC  [KERNEL32.DLL+0x17bd4]\nC \
+    \ [ntdll.dll+0x6ced1]\n\n\n---------------  P R O C E S S  ---------------\n\n\
+    Threads class SMR info:\n_java_thread_list=0x00007ffbf13d7928, length=0, elements={\n\
+    }\n\nJava Threads: ( => current thread )\n\nOther Threads:\n  0x0000022177c8f000\
+    \ GCTaskThread \"GC Thread#0\" [stack: 0x0000006944b00000,0x0000006944c00000]\
+    \ [id=16856]\n\n[error occurred during error reporting (printing all threads),\
+    \ id 0xc0000005, EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007ffbf0c05680]\n\
+    \nVM state:not at safepoint (not fully initialized)\n\nVM Mutex/Monitor currently\
+    \ owned by a thread:  ([mutex/lock_event])\n[0x0000022177c68390] Heap_lock - owner\
+    \ thread: 0x0000022177c6c000\n\nHeap address: 0x00000000e0000000, size: 512 MB,\
+    \ Compressed Oops mode: Non-zero based: 0x00000000e0000000\nNarrow klass base:\
+    \ 0x0000000000000000, Narrow klass shift: 0\n\nGC Heap History (0 events):\nNo\
+    \ events\n\nDeoptimization events (0 events):\nNo events\n\nClasses redefined\
+    \ (0 events):\nNo events\n\nInternal exceptions (0 events):\nNo events\n\nEvents\
+    \ (0 events):\nNo events\n\n\nDynamic libraries:\n0x00007ff7e6c60000 - 0x00007ff7e6c6f000\
+    \ \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\java.exe\n0x00007ffc3f000000 - 0x00007ffc3f1f0000\
+    \ \tC:\\WINDOWS\\SYSTEM32\\ntdll.dll\n0x00007ffc3dd50000 - 0x00007ffc3de02000\
+    \ \tC:\\WINDOWS\\System32\\KERNEL32.DLL\n0x00007ffc3c330000 - 0x00007ffc3c5d3000\
+    \ \tC:\\WINDOWS\\System32\\KERNELBASE.dll\n0x00007ffc3c090000 - 0x00007ffc3c18a000\
+    \ \tC:\\WINDOWS\\System32\\ucrtbase.dll\n0x00007ffc235c0000 - 0x00007ffc235d6000\
+    \ \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\VCRUNTIME140.dll\n0x00007ffc1e370000\
+    \ - 0x00007ffc1e388000 \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\jli.dll\n0x00007ffc3df30000\
+    \ - 0x00007ffc3dfd3000 \tC:\\WINDOWS\\System32\\ADVAPI32.dll\n0x00007ffc3de10000\
+    \ - 0x00007ffc3deae000 \tC:\\WINDOWS\\System32\\msvcrt.dll\n0x00007ffc3d210000\
+    \ - 0x00007ffc3d2a7000 \tC:\\WINDOWS\\System32\\sechost.dll\n0x00007ffc3d900000\
+    \ - 0x00007ffc3da20000 \tC:\\WINDOWS\\System32\\RPCRT4.dll\n0x00007ffc3da30000\
+    \ - 0x00007ffc3dbc4000 \tC:\\WINDOWS\\System32\\USER32.dll\n0x00007ffc3c860000\
+    \ - 0x00007ffc3c881000 \tC:\\WINDOWS\\System32\\win32u.dll\n0x00007ffc2ce30000\
+    \ - 0x00007ffc2d0b5000 \tC:\\WINDOWS\\WinSxS\\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.18362.720_none_e6beb5c51314836b\\\
+    COMCTL32.dll\n0x00007ffc3d2b0000 - 0x00007ffc3d2d6000 \tC:\\WINDOWS\\System32\\\
+    GDI32.dll\n0x00007ffc3d440000 - 0x00007ffc3d776000 \tC:\\WINDOWS\\System32\\combase.dll\n\
+    0x00007ffc3c5e0000 - 0x00007ffc3c774000 \tC:\\WINDOWS\\System32\\gdi32full.dll\n\
+    0x00007ffc3d010000 - 0x00007ffc3d0ae000 \tC:\\WINDOWS\\System32\\msvcp_win.dll\n\
+    0x00007ffc3c7e0000 - 0x00007ffc3c860000 \tC:\\WINDOWS\\System32\\bcryptPrimitives.dll\n\
+    0x00007ffc36e70000 - 0x00007ffc36e7a000 \tC:\\WINDOWS\\SYSTEM32\\VERSION.dll\n\
+    0x00007ffc3d7f0000 - 0x00007ffc3d81e000 \tC:\\WINDOWS\\System32\\IMM32.DLL\n0x00007ffc08df0000\
+    \ - 0x00007ffc08e9a000 \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\msvcp140.dll\n\
+    0x00007ffbf0900000 - 0x00007ffbf1477000 \tC:\\Program Files\\Java\\jdk-12.0.2\\\
+    bin\\server\\jvm.dll\n0x00007ffc3d0c0000 - 0x00007ffc3d0c8000 \tC:\\WINDOWS\\\
+    System32\\PSAPI.DLL\n0x00007ffc37de0000 - 0x00007ffc37e04000 \tC:\\WINDOWS\\SYSTEM32\\\
+    WINMM.dll\n0x00007ffc28400000 - 0x00007ffc28409000 \tC:\\WINDOWS\\SYSTEM32\\WSOCK32.dll\n\
+    0x00007ffc3d780000 - 0x00007ffc3d7ef000 \tC:\\WINDOWS\\System32\\WS2_32.dll\n\
+    0x00007ffc37db0000 - 0x00007ffc37ddd000 \tC:\\WINDOWS\\SYSTEM32\\winmmbase.dll\n\
+    0x00007ffc3c040000 - 0x00007ffc3c08a000 \tC:\\WINDOWS\\System32\\cfgmgr32.dll\n\
+    0x00007ffc3bf00000 - 0x00007ffc3bf11000 \tC:\\WINDOWS\\System32\\kernel.appcore.dll\n\
+    0x00007ffc1e350000 - 0x00007ffc1e361000 \tC:\\Program Files\\Java\\jdk-12.0.2\\\
+    bin\\verify.dll\n0x00007ffc29d80000 - 0x00007ffc29f74000 \tC:\\WINDOWS\\SYSTEM32\\\
+    DBGHELP.DLL\n0x00007ffc29d50000 - 0x00007ffc29d7a000 \tC:\\WINDOWS\\SYSTEM32\\\
+    dbgcore.DLL\n0x00007ffc1e320000 - 0x00007ffc1e346000 \tC:\\Program Files\\Java\\\
+    jdk-12.0.2\\bin\\java.dll\n0x00007ffc1e300000 - 0x00007ffc1e317000 \tC:\\Program\
+    \ Files\\Java\\jdk-12.0.2\\bin\\zip.dll\n0x00007ffc236a0000 - 0x00007ffc236aa000\
+    \ \tC:\\Program Files\\Java\\jdk-12.0.2\\bin\\jimage.dll\n\ndbghelp: loaded successfully\
+    \ - version: 4.0.5 - missing functions: none\nsymbol engine: initialized successfully\
+    \ - sym options: 0x614 - pdb path: .;C:\\Program Files\\Java\\jdk-12.0.2\\bin;C:\\\
+    WINDOWS\\SYSTEM32;C:\\WINDOWS\\WinSxS\\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.18362.720_none_e6beb5c51314836b;C:\\\
+    Program Files\\Java\\jdk-12.0.2\\bin\\server\n\nVM Arguments:\njvm_args: -Dorg.gradle.native=false\
+    \ -Xmx512m -Dfile.encoding=utf-8 -Duser.country=IN -Duser.language=en -Duser.variant\
+    \ -ea \njava_command: worker.org.gradle.process.internal.worker.GradleWorkerMain\
+    \ 'Gradle Test Executor 2'\njava_class_path (initial): C:\\Users\\Asus\\.gradle\\\
+    caches\\5.3.1\\workerMain\\gradle-worker.jar;C:\\Users\\Asus\\IdeaProjects\\Simple\
+    \ Chatty Bot\\Simple Chatty Bot\\task\\build\\classes\\java\\test;C:\\Users\\\
+    Asus\\IdeaProjects\\Simple Chatty Bot\\Simple Chatty Bot\\task\\build\\resources\\\
+    test;C:\\Users\\Asus\\IdeaProjects\\Simple Chatty Bot\\Simple Chatty Bot\\task\\\
+    build\\classes\\java\\main;C:\\Users\\Asus\\IdeaProjects\\Simple Chatty Bot\\\
+    Simple Chatty Bot\\task\\build\\resources\\main;C:\\Users\\Asus\\.gradle\\caches\\\
+    modules-2\\files-2.1\\com.github.hyperskill\\hs-test\\v6.0.1\\f53c6e96c6c1da130d9d9c77cc2ce2de63a4294d\\\
+    hs-test-v6.0.1.jar;C:\\Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\com.github.stefanbirkner\\\
+    system-rules\\1.19.0\\d541c9a1cff0dda32e2436c74562e2e4aa6c88cd\\system-rules-1.19.0.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.assertj\\assertj-swing-junit\\\
+    3.8.0\\51a93135b0edac8f92cd67bceea6efa2e2dfa870\\assertj-swing-junit-3.8.0.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\junit\\junit\\4.12\\2973d150c0dc1fefe998f834810d68f278ea58ec\\\
+    junit-4.12.jar;C:\\Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.hamcrest\\\
+    hamcrest-core\\1.3\\42a25dc3219429f0e5d060061f71acb49bf010a0\\hamcrest-core-1.3.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\\
+    httpclient\\4.5.9\\a25c1be5ce99d0ce99aa43eb982868c796dd0775\\httpclient-4.5.9.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\com.google.code.gson\\gson\\\
+    2.8.5\\f645ed69d595b24d4cf8b3fbb64cc505bede8829\\gson-2.8.5.jar;C:\\Users\\Asus\\\
+    .gradle\\caches\\modules-2\\files-2.1\\com.cedarsoftware\\json-io\\4.10.1\\e9083dfdee4899ad2f6a83618c20ab3d7b88430b\\\
+    json-io-4.10.1.jar;C:\\Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\com.fasterxml.jackson.core\\\
+    jackson-databind\\2.9.8\\11283f21cc480aa86c4df7a0a3243ec508372ed2\\jackson-databind-2.9.8.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.assertj\\assertj-swing\\\
+    3.8.0\\43e985f95237bf9c5fbfa21230f30cc5e859a4fb\\assertj-swing-3.8.0.jar;C:\\\
+    Users\\Asus\\.gradle\\caches\\modules-2\\files-2.1\\org.easytesting\\fest-r\n\
+    Launcher Type: SUN_STANDARD\n\n[Global flags]\n     intx CICompilerCount     \
+    \                     = 4                                         {product} {ergonomic}\n\
+    \     uint ConcGCThreads                            = 2                      \
+    \                   {product} {ergonomic}\n     uint G1ConcRefinementThreads \
+    \                 = 8                                         {product} {ergonomic}\n\
+    \   size_t G1HeapRegionSize                         = 1048576                \
+    \                   {product} {ergonomic}\n    uintx GCDrainStackTargetSize  \
+    \                 = 64                                        {product} {ergonomic}\n\
+    \   size_t InitialHeapSize                          = 134217728              \
+    \                   {product} {ergonomic}\n   size_t MarkStackSize           \
+    \                 = 4194304                                   {product} {ergonomic}\n\
+    \   size_t MaxHeapSize                              = 536870912              \
+    \                   {product} {command line}\n   size_t MinHeapDeltaBytes    \
+    \                    = 1048576                                   {product} {ergonomic}\n\
+    \    uintx NonNMethodCodeHeapSize                   = 5836300                \
+    \                {pd product} {ergonomic}\n    uintx NonProfiledCodeHeapSize \
+    \                 = 122910970                              {pd product} {ergonomic}\n\
+    \    uintx ProfiledCodeHeapSize                     = 122910970              \
+    \                {pd product} {ergonomic}\n    uintx ReservedCodeCacheSize   \
+    \                 = 251658240                              {pd product} {ergonomic}\n\
+    \     bool SegmentedCodeCache                       = true                   \
+    \                   {product} {ergonomic}\n     bool UseCompressedClassPointers\
+    \               = true                                 {lp64_product} {ergonomic}\n\
+    \     bool UseCompressedOops                        = true                   \
+    \              {lp64_product} {ergonomic}\n     bool UseG1GC                 \
+    \                 = true                                      {product} {ergonomic}\n\
+    \     bool UseLargePagesIndividualAllocation        = false                  \
+    \                {pd product} {ergonomic}\n\nLogging:\nLog output configuration:\n\
+    \ #0: stdout all=warning uptime,level,tags\n #1: stderr all=off uptime,level,tags\n\
+    \nEnvironment Variables:\nPATH=C:\\Program Files (x86)\\Intel\\iCLS Client\\;C:\\\
+    Program Files\\Intel\\iCLS Client\\;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\\
+    System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\
+    \ (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files (x86)\\Intel\\Intel(R)\
+    \ Management Engine Components\\DAL;C:\\Program Files\\Intel\\Intel(R) Management\
+    \ Engine Components\\DAL;C:\\Program Files (x86)\\Intel\\Intel(R) Management Engine\
+    \ Components\\IPT;C:\\Program Files\\Intel\\Intel(R) Management Engine Components\\\
+    IPT;C:\\Program Files\\Intel\\WiFi\\bin\\;C:\\Program Files\\Common Files\\Intel\\\
+    WirelessCommon\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\\
+    WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Git\\cmd;C:\\\
+    WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR;C:\\\
+    WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\\
+    WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Users\\Asus\\AppData\\\
+    Local\\Microsoft\\WindowsApps;C:\\Program Files\\Java\\jdk-12.0.2\\bin;\nUSERNAME=DEEPANSHU\n\
+    OS=Windows_NT\nPROCESSOR_IDENTIFIER=Intel64 Family 6 Model 158 Stepping 9, GenuineIntel\n\
+    \n\n\n---------------  S Y S T E M  ---------------\n\nOS: Windows 10 , 64 bit\
+    \ Build 18362 (10.0.18362.329)\n\nCPU:total 8 (initial active 8) (4 cores per\
+    \ cpu, 2 threads per core) family 6 model 158 stepping 9, cmov, cx8, fxsr, mmx,\
+    \ sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms,\
+    \ 3dnowpref, lzcnt, ht, tsc, tscinvbit, bmi1, bmi2, adx, fma\n\nMemory: 4k page,\
+    \ system-wide physical 8075M (1862M free)\nTotalPageFile size 8075M (AvailPageFile\
+    \ size 5M)\ncurrent process WorkingSet (physical memory assigned to process):\
+    \ 9M, peak: 9M\ncurrent process commit charge (\"private bytes\"): 58M, peak:\
+    \ 59M\n\nvm_info: Java HotSpot(TM) 64-Bit Server VM (12.0.2+10) for windows-amd64\
+    \ JRE (12.0.2+10), built on Jul 16 2019 01:56:17 by \"mach5one\" with MS VC++\
+    \ 15.5 (VS2017)\n\nEND.\n"
+  learner_created: false
+feedback_link: https://hyperskill.org/projects/31/stages/167/implement
+status: Unchecked
+record: -1
