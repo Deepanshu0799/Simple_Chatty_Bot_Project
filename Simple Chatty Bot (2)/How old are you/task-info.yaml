@@ -111,6 +111,9 @@ files:
 
     }
   learner_created: false
+- name: hs_err_pid9160.log
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/31/stages/166/implement
 status: Failed
 record: 4
