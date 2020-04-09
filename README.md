@@ -1,11 +1,11 @@
-Simple_Chatty_Bot
+Simple_Chatty_Bot_Project
 It is a simple console chat bot will do wonders to guide you through the basics of coding
 
 Getting Started
 
 Prerequisites
 
-IntelliJ IDEA Ultimate Jet Brain Toolbox
+IntelliJ IDEA Ultimate Jet Brain Toolbox and Hyperskill account as it is a hyperskill project.
 
 Test Cases Just be certain with the given given conditions
 
